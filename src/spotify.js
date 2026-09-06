@@ -45,10 +45,6 @@ const authorizeSpotify = async()=>{
 }
 
 
-const urlParams = new URLSearchParams(window.location.search);
-let code = urlParams.get('code');
-
-
 const getToken = async code => {
 
   // stored in the previous step
@@ -70,11 +66,18 @@ const getToken = async code => {
 
         const body = await fetch(url, payload);
         const response = await body.json();
+        console.log("this is spotify.js line 73 console", response);
+        
+        if (response.access_token) {
+            localStorage.setItem('access_token', response.access_token)
 
-        localStorage.setItem('access_token', response.access_token);
+            window.history.replaceState(null, "", "/")
+        }
+        console.log(
+            "saved token exists:",
+            localStorage.getItem('access_token') ? "YES" : "NO"
+        );
 }
-if(code){
-     getToken(code)
-};
 
-export { authorizeSpotify };
+export {authorizeSpotify , getToken};
+

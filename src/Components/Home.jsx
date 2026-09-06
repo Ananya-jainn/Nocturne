@@ -1,7 +1,51 @@
 import React from "react";
-import { authorizeSpotify } from "../spotify";
+import { useState } from "react";
+import { authorizeSpotify} from "../spotify";
+
 
 function Home() {
+  const [searchArtist, setSearchArtist] = useState("");
+  const [artists, setArtists] = useState("");
+
+
+  const handleDiscover = () => {
+    const token = localStorage.getItem('access_token')
+    console.log("handleDiscover clicked")
+    if(token){
+     console.log("it worked ig")
+    } else{
+      authorizeSpotify()
+    }
+  }
+  const handleSearchArtist = async() =>{
+    const token = localStorage.getItem('access_token')
+
+    if (token) {
+
+      const url = 'https://api.spotify.com/v1/search'
+      const params = new URLSearchParams({
+        q : searchArtist ,
+        type : "artist"
+      })
+     const finalUrl = url + '?' + params.toString()
+    
+    const response = await (fetch(finalUrl,{
+      headers:{
+        Authorization :`Bearer ${token}`
+      }
+    }));
+    const data = await response.json();
+    console.log(data);
+    console.log(data.artists.items)
+    setArtists(data.artists.items)
+
+
+
+    } else{
+      authorizeSpotify()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-black text-[#faebd7]">
 
@@ -13,7 +57,8 @@ function Home() {
         </h1>
 
         <div className="hidden md:flex items-center gap-10 text-sm text-gray-400">
-          <a href="#" className="hover:text-[#faebd7] transition">
+          <a href="#" className="hover:text-[#faebd7] transition"
+          onClick={handleDiscover()}>
             Discover
           </a>
 
@@ -162,6 +207,14 @@ function Home() {
             >
 
               <input
+              value={searchArtist}
+              onChange={(e)=>setSearchArtist(e.target.value)}
+              onKeyDown={(e) =>{
+                if(e.key== 'Enter'){
+                  handleSearchArtist(e)
+                  console.log("chalgaya(Checkpoint1)")
+                }
+              }}
                 type="text"
                 placeholder="Search an artist..."
                 className="
