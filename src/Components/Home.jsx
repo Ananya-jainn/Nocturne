@@ -1,51 +1,11 @@
 import React from "react";
 import { useState } from "react";
-import { authorizeSpotify} from "../spotify";
+import { Link } from "react-router-dom";
 
 
 function Home() {
-  const [searchArtist, setSearchArtist] = useState("");
-  const [artists, setArtists] = useState("");
-
-
-  const handleDiscover = () => {
-    const token = localStorage.getItem('access_token')
-    console.log("handleDiscover clicked")
-    if(token){
-     console.log("it worked ig")
-    } else{
-      authorizeSpotify()
-    }
-  }
-  const handleSearchArtist = async() =>{
-    const token = localStorage.getItem('access_token')
-
-    if (token) {
-
-      const url = 'https://api.spotify.com/v1/search'
-      const params = new URLSearchParams({
-        q : searchArtist ,
-        type : "artist"
-      })
-     const finalUrl = url + '?' + params.toString()
-    
-    const response = await (fetch(finalUrl,{
-      headers:{
-        Authorization :`Bearer ${token}`
-      }
-    }));
-    const data = await response.json();
-    console.log(data);
-    console.log(data.artists.items)
-    setArtists(data.artists.items)
-
-
-
-    } else{
-      authorizeSpotify()
-    }
-  }
-
+  
+ 
   return (
     <div className="min-h-screen bg-black text-[#faebd7]">
 
@@ -57,10 +17,12 @@ function Home() {
         </h1>
 
         <div className="hidden md:flex items-center gap-10 text-sm text-gray-400">
-          <a href="#" className="hover:text-[#faebd7] transition"
-          onClick={handleDiscover()}>
-            Discover
-          </a>
+          <Link
+            to="/discover"
+            className="hover:text-[#faebd7] transition"
+          >
+          Discover
+          </Link>
 
           <a href="#" className="hover:text-[#faebd7] transition">
             Genres
@@ -153,7 +115,7 @@ function Home() {
                 "
               >
                 <span className="hidden sm:block">
-                  Discover
+                 Search
                 </span>
 
                 <span className="text-lg">
@@ -172,64 +134,7 @@ function Home() {
           </div>
 
 
-          {/* OR */}
-          <div className="flex items-center gap-4 max-w-md mx-auto my-10">
-
-            <div className="h-px bg-white/10 flex-1" />
-
-            <span className="text-xs text-gray-600 uppercase tracking-widest">
-              OR
-            </span>
-
-            <div className="h-px bg-white/10 flex-1" />
-
-          </div>
-
-
-          {/* ARTIST SEARCH */}
-          <div className="max-w-md mx-auto">
-
-            <div
-              className="
-                flex
-                items-center
-                gap-3
-                bg-transparent
-                border
-                border-white/10
-                rounded-full
-                px-5
-                py-3
-                focus-within:border-[#ad46e4c9]
-                transition
-                mb-16
-              "
-            >
-
-              <input
-              value={searchArtist}
-              onChange={(e)=>setSearchArtist(e.target.value)}
-              onKeyDown={(e) =>{
-                if(e.key== 'Enter'){
-                  handleSearchArtist(e)
-                  console.log("chalgaya(Checkpoint1)")
-                }
-              }}
-                type="text"
-                placeholder="Search an artist..."
-                className="
-                  flex-1
-                  bg-transparent
-                  outline-none
-                  text-sm
-                  text-[#faebd7]
-                  placeholder:text-gray-600
-                "
-              />
-
-            </div>
-
-          </div>
+          
 
 
           

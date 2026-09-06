@@ -5,6 +5,8 @@ import './index.css'
 import App from './App.jsx'
 import Callback from './Components/Callback.jsx'
 import Home from './Components/Home.jsx'
+import Discover from './Components/Discover.jsx'
+import Artist from './Components/Artist.jsx'
 
 const router = createBrowserRouter([
     {
@@ -19,16 +21,23 @@ const router = createBrowserRouter([
             path: "/callback",
             element: <Callback />,
         },
+        {
+          path: "/discover",
+          element: <Discover/>
+        },
+        {
+          path: "/artist/:id",
+          element: <Artist/>
+        },
     ],
 },
 ])
 
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <Provider>
+
+   
       <RouterProvider router = {router}/>
-    </Provider>
     
-  </StrictMode>,
+ 
 )
