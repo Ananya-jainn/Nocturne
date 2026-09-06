@@ -1,3 +1,6 @@
+import React from "react";
+import { authorizeSpotify } from "../spotify";
+
 function Home() {
   return (
     <div className="min-h-screen bg-black text-[#faebd7]">
@@ -23,9 +26,9 @@ function Home() {
           </a>
         </div>
 
-        {/* <button className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#6d4aff] hover:text-[#6d4aff] transition">
+         <button className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#6d4aff] hover:text-[#6d4aff] transition">
           Sign in
-        </button> */}
+        </button> 
 
       </nav>
 
@@ -157,8 +160,6 @@ function Home() {
                 mb-16
               "
             >
-
-              
 
               <input
                 type="text"
