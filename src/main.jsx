@@ -7,6 +7,10 @@ import Callback from './Components/Callback.jsx'
 import Home from './Components/Home.jsx'
 import Discover from './Components/Discover.jsx'
 import Artist from './Components/Artist.jsx'
+import Signup from './Components/Signup.jsx'
+import Login from './Components/Login.jsx'
+import Favourites from './Components/Favourites.jsx'
+import Vibe from './Components/Vibe.jsx'
 
 const router = createBrowserRouter([
     {
@@ -28,6 +32,22 @@ const router = createBrowserRouter([
         {
           path: "/artist/:id",
           element: <Artist/>
+        },
+        {
+          path: "/login",
+          element: <Login/>
+        },
+        {
+          path: "/sign-up",
+          element: <Signup/>
+        },
+        {
+          path: "/vibe",
+          element: <Vibe/>
+        },
+        {
+          path: "/favourites",
+          element: <Favourites/>
         },
     ],
 },

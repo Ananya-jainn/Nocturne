@@ -12,3 +12,15 @@ body {
   font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
 }
+.recommendations-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.recommendations-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.recommendations-scroll::-webkit-scrollbar-thumb {
+  background: #a855f7;
+  border-radius: 999px;
+}

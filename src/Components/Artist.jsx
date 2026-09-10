@@ -73,7 +73,7 @@ function Artist() {
         <>
        <div className="min-h-screen bg-black text-[#faebd7] mt-3 mb-10 ">
 
-        <div className="max-w-4xl mx-auto border border-none rounded-[35px] p-6 md:p-8 bg-gradient-to-br from-[#2a0441e8] via-[#3c01016d] to-[#110319]">
+        <div className="max-w-4xl mx-auto border border-none rounded-[35px] p-6 md:p-8 bg-linear-to-br from-[#2a0441e8] via-[#3c01016d] to-[#110319]">
 
             <div className="grid grid-cols-1 md:grid-cols-[1fr_1.4fr] gap-12">
 

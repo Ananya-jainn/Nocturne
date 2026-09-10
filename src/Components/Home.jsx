@@ -1,10 +1,17 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 
 
 function Home() {
-  
+  const [vibe, setVibe] = useState("");
+  const navigate = useNavigate()
+
+  const handleVibeSearch = () => {
+    navigate("/vibe",{
+      state: {vibe:vibe}
+    });
+  };
  
   return (
     <div className="min-h-screen bg-black text-[#faebd7]">
@@ -80,6 +87,8 @@ function Home() {
             >
 
               <textarea
+              value={vibe}
+              onChange={(e) => setVibe(e.target.value)}
                 rows="2"
                 placeholder="Describe the music you're looking for..."
                 className="
@@ -97,6 +106,7 @@ function Home() {
               />
 
               <button
+              onClick={handleVibeSearch}
                 className="
                   flex
                   items-center
