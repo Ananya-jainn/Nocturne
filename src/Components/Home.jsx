@@ -31,16 +31,20 @@ function Home() {
           Discover
           </Link>
 
-          <a href="#" className="hover:text-[#faebd7] transition">
-            Genres
-          </a>
+          <Link
+            to="/genres"
+            className="hover:text-[#faebd7] transition"
+          >
+          Genres
+          </Link>
 
           <a href="#" className="hover:text-[#faebd7] transition">
             Favourites
           </a>
         </div>
 
-         <button className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#6d4aff] hover:text-[#6d4aff] transition">
+         <button className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#6d4aff] hover:text-[#6d4aff] transition"
+         to="/login">
           Sign in
         </button> 
 

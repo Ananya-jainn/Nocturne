@@ -1,46 +1,37 @@
 import React from 'react';
 import { useLocation } from "react-router-dom";
+import { useEffect , useState} from 'react';
+import { searchTracks } from '../spotify';
 
 function Vibe() {
+
     const location = useLocation();
     const vibe = location.state?.vibe;
     console.log(vibe)
+        const [recommendation , setRecommendation] = useState([]);
 
-    const recommendations = [   
+    useEffect(() => {
+         const sendVibe = async () => {
+            const response = await fetch("http://localhost:3000/vibe", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                vibe: vibe,
+            }),
+            });
 
-        {                       
-            name: "Song Name 1",
-            artist: "Artist Name 1",
-            image: "https://placehold.co/200",
-        },
-
-        {                       
-            name: "Song Name 2",
-            artist: "Artist Name 2",
-            image: "https://placehold.co/200",
-        },
-        {                       
-            name: "Song Name 3",
-            artist: "Artist Name 2",
-            image: "https://placehold.co/200",
-        },
-        {                       
-            name: "Song Name 4",
-            artist: "Artist Name 2",
-            image: "https://placehold.co/200",
-        },
-        {                       
-            name: "Song Name 5",
-            artist: "Artist Name 2",
-            image: "https://placehold.co/200",
-        },
-        {                       
-            name: "Song Name 6",
-            artist: "Artist Name 2",
-            image: "https://placehold.co/200",
-        },
-
-    ]; //hardcoded abhi ke liye
+                const data = await response.json();
+                console.log(data);
+                const tracks = await searchTracks(data.searchTerms[0]);
+                console.log(tracks);
+                setRecommendation(tracks);
+                
+        };
+        sendVibe();
+    }, [vibe]);
+   
     return (
         
         <>
@@ -61,7 +52,7 @@ function Vibe() {
                 <div className="recommendations-scroll h-full overflow-y-auto pr-4">
 
             {/* Recommendations will go here */}
-            {recommendations.map((song) => (
+            {recommendation.map((song) => (
             <div
                 key={song.name}
                 className="flex items-center gap-5 border-b border-[#ad46e4c9]/40 py-5"

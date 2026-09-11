@@ -11,6 +11,7 @@ import Signup from './Components/Signup.jsx'
 import Login from './Components/Login.jsx'
 import Favourites from './Components/Favourites.jsx'
 import Vibe from './Components/Vibe.jsx'
+import Genres from './Components/Genres.jsx'
 
 const router = createBrowserRouter([
     {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
         {
           path: "/favourites",
           element: <Favourites/>
+        },
+        {
+          path: "/genres",
+          element: <Genres/>
         },
     ],
 },

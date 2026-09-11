@@ -79,5 +79,29 @@ const getToken = async code => {
         );
 }
 
-export {authorizeSpotify , getToken};
+const searchTracks = async (searchTerm) => {
+  const token = localStorage.getItem("access_token");
+
+  console.log("Spotify token:", token);
+
+  const response = await fetch(
+    `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+      searchTerm
+    )}&type=track&limit=10`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  console.log("Spotify response:", data);
+
+  return data.tracks.items;
+};
+
+
+export {authorizeSpotify , getToken , searchTracks};
 
