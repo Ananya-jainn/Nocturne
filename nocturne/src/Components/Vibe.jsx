@@ -24,9 +24,7 @@ function Vibe() {
 
                 const data = await response.json();
                 console.log(data);
-                const tracks = await searchTracks(data.searchTerms[0]);
-                console.log(tracks);
-                setRecommendation(tracks);
+                setRecommendation(data.tracks);
                 
         };
         sendVibe();
@@ -52,34 +50,39 @@ function Vibe() {
                 <div className="recommendations-scroll h-full overflow-y-auto pr-4">
 
             {/* Recommendations will go here */}
-            {recommendation.map((song) => (
-            <div
-                key={song.name}
-                className="flex items-center gap-5 border-b border-[#ad46e4c9]/40 py-5"
-            >
-                
-                <div className="h-16 w-16 rounded-xl overflow-hidden">
-                <img
-                    src={song.image}
-                    alt={song.name}
-                    className="h-full w-full object-cover"
-                />
-                </div>
+                    {recommendation.map((song) => (
+                    <div
+                        key={song.name}
+                        className="flex items-center justify-between gap-5 border-b border-[#ad46e4c9]/40 py-5"
+                    >
+                        
+                        <div className="h-16 w-16 rounded-xl overflow-hidden">
+                        <img
+                            src={song.album.images[0]?.url}
+                            alt={song.id}
+                            className="h-full w-full object-cover"
+                        />
+                        </div>
 
-                <div>
-                <h2 className="text-lg font-semibold">
-                    {song.name}
-                </h2>
+                        <div>
+                        <h2 className="text-lg font-semibold">
+                            {song.name}
+                        </h2>
 
-                <p className="mt-1 text-sm text-[#faebd7]/60">
-                    {song.artist}
-                </p>
-                </div>
-
-            </div>
-            ))}
-               
+                        <p className="mt-1 text-sm text-[#faebd7]/60">
+                            {song.artists.map((artist) => artist.name).join(", ")}
+                        </p>
+                        </div>
+                        <button
+                        className="text-2xl text-[#faebd7]/60 transition hover:scale-110 hover:text-[#ad46e4]"
+                        >
+                         &#9829; 
+                        </button>
                     
+                    </div>
+                     
+                    ))}
+                 
                 </div>
             </div>
 

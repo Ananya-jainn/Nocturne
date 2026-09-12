@@ -64,7 +64,7 @@ function Login() {
             New here?{" "}
             
             <Link
-              to="/signup"
+              to="/sign-up"
               className="text-[#ad46e4] transition hover:text-[#faebd7]"
             >
               Create an account

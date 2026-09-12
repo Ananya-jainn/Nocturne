@@ -77,6 +77,7 @@ app.post("/vibe", async (req, res) => {
       {
         "moods": [],
         "genres": [],
+        "artists":[],
         "searchTerms": []
       }
 
@@ -99,7 +100,11 @@ app.post("/vibe", async (req, res) => {
   console.log("Spotify token:", spotifyToken);
   console.log("tracks output" , tracks);
 
-  res.json(vibeData);
+  res.json({
+  moods: vibeData.moods,
+  genres: vibeData.genres,
+  tracks: tracks,
+});
 });
 
 app.listen(3000, () => {

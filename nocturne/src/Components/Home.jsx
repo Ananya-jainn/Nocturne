@@ -38,13 +38,16 @@ function Home() {
           Genres
           </Link>
 
-          <a href="#" className="hover:text-[#faebd7] transition">
-            Favourites
-          </a>
+          <Link
+            to="/favourites"
+            className="hover:text-[#faebd7] transition"
+          >
+          Favourites
+          </Link>
         </div>
 
          <button className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#6d4aff] hover:text-[#6d4aff] transition"
-         to="/login">
+         onClick={() => navigate("/login")}>
           Sign in
         </button> 
 
@@ -116,7 +119,7 @@ function Home() {
                   items-center
                   justify-center
                   gap-2
-                  bg-[#ad46e4c9]
+                  bg-[#852cb5c9]
                   hover:bg-[#ad46e4c9]
                   text-white
                   rounded-4xl
@@ -129,7 +132,7 @@ function Home() {
                 "
               >
                 <span className="hidden sm:block">
-                 Search
+                 lets find it !
                 </span>
 
                 <span className="text-lg">
