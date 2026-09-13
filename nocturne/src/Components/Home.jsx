@@ -1,11 +1,19 @@
 import React from "react";
 import { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
+import { useSelector , useDispatch } from "react-redux";
 
 
 function Home() {
   const [vibe, setVibe] = useState("");
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const user = useSelector((state) => state.auth.user);
+  console.log("Redux user:", user);
+
+  const isLoggedin = useSelector((state) => state.auth.isLoggedin);
+  console.log(isLoggedin)
 
   const handleVibeSearch = () => {
     navigate("/vibe",{
@@ -52,6 +60,8 @@ function Home() {
         </button> 
 
       </nav>
+
+
 
 
       {/* HERO */}

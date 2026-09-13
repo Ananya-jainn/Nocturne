@@ -1,5 +1,9 @@
 require("dotenv").config();
 
+const mongoose = require("mongoose");
+const User = require("./model/user");
+const bcrypt = require("bcryptjs")
+
 
 const express = require("express");
 const cors = require("cors");
@@ -15,6 +19,14 @@ const ai = new GoogleGenAI({
 
 app.use(cors())
 app.use(express.json());
+
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((error) => {
+    console.log("MongoDB connection error:", error);
+  });
 
 app.get("/", (req, res) => {
   res.send("Nocturne backend is working!");
@@ -106,6 +118,61 @@ app.post("/vibe", async (req, res) => {
   tracks: tracks,
 });
 });
+
+app.post("/sign-up", async (req, res) => {
+ try { const { name, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = new User({
+  name,
+  email,
+  password: hashedPassword,
+  });
+  console.log(user);
+  await user.save();
+  res.json({
+  message: "Account created successfully",
+  });
+} catch(error){
+  console.log("sign-up error:",error);
+  if (error.code === 11000) {
+    res.status(400).json({
+      message: "An account with this email already exists",
+    });
+  } else {
+      res.status(500).json({
+        message: "Something went wrong",
+      });
+    };
+  }
+});
+
+app.post("/login",async(req,res) => {
+  try{
+    const{ email , password } = req.body;
+    const user = await User.findOne({email});
+
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user.password
+    );
+    if (!user || !isPasswordCorrect) {
+      return res.status(401).json({
+        message: "Invalid email or password"
+      });
+    }
+    res.json({
+      message: "Login successful",
+      user: {
+        name: user.name,
+        email: user.email
+      }
+    });
+
+  }catch(error){
+    console.log("login-page-error:",error)
+  }
+})
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
