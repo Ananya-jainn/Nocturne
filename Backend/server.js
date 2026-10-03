@@ -200,6 +200,30 @@ app.post("/login",async(req,res) => {
   }
 })
 
+
+app.post("/favorites/song", async (req, res) => {
+  try {
+    const { userId, song } = req.body;
+
+    const user = await User.findById(userId);
+
+    user.favoriteSongs.push(song);
+
+    await user.save();
+
+    res.json({
+      message: "Song added to favorites",
+    });
+
+  } catch (error) {
+    console.log("add favorite song error:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
