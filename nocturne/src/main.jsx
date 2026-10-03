@@ -11,9 +11,11 @@ import Discover from './Components/Discover.jsx'
 import Artist from './Components/Artist.jsx'
 import Signup from './Components/Signup.jsx'
 import Login from './Components/Login.jsx'
-import Favourites from './Components/Favourites.jsx'
+import Favorites from './Components/Favorites.jsx'
 import Vibe from './Components/Vibe.jsx'
 import Genres from './Components/Genres.jsx'
+
+import ProtectedRoute from './Components/ProtectedRoute.jsx'
 
 
 const router = createBrowserRouter([
@@ -49,9 +51,12 @@ const router = createBrowserRouter([
           path: "/vibe",
           element: <Vibe/>
         },
-        {
-          path: "/favourites",
-          element: <Favourites/>
+        {  
+          element: <ProtectedRoute/>,
+          children :[{
+            path: "/favorites",
+            element: <Favorites/>},
+          ],
         },
         {
           path: "/genres",

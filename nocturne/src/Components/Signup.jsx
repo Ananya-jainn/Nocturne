@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
  
 
   const handleSubmit = async(e) =>{
@@ -22,6 +24,10 @@ function Signup() {
     });
     const data = await response.json();
     console.log(data);
+
+    if (response.ok){
+      navigate("/");
+    }
   }
   return (
     <div className="min-h-screen bg-black px-6 py-10 text-[#faebd7]">

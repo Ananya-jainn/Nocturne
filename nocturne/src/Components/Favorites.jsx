@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const favouriteSongs = [
+const favoriteSongs = [
   {
     id: 1,
     name: "After Hours",
@@ -27,7 +27,7 @@ const favouriteSongs = [
   },
 ];
 
-const favouriteArtists = [
+const favoriteArtists = [
   {
     id: 1,
     name: "Chase Atlantic",
@@ -50,7 +50,7 @@ const favouriteArtists = [
   },
 ];
 
-function Favourites() {
+function Favorites() {
   const [activeTab, setActiveTab] = useState("songs");
   return (
     <div className="min-h-screen bg-black px-6 py-10 text-[#faebd7]">
@@ -60,7 +60,7 @@ function Favourites() {
 
         <div className="mb-12">
           <h1 className="font-display text-5xl font-semibold tracking-tight">
-            FAVOURITES
+            FAVORITES
           </h1>
 
           <p className="mt-3 text-[#faebd7]/60">
@@ -98,7 +98,7 @@ function Favourites() {
 
         {activeTab === "songs" && (
           <div className="grid gap-4">
-            {favouriteSongs.map((song) => (
+            {favoriteSongs.map((song) => (
               <div
                 key={song.id}
                 className="group flex items-center justify-between rounded-2xl border border-[#faebd7]/10 p-4 transition hover:border-[#ad46e4]/60"
@@ -131,7 +131,7 @@ function Favourites() {
 
         {activeTab === "artists" && (
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-            {favouriteArtists.map((artist) => (
+            {favoriteArtists.map((artist) => (
               <div
                 key={artist.id}
                 className="group cursor-pointer"
@@ -157,4 +157,4 @@ function Favourites() {
   );
 }
 
-export default Favourites;
+export default Favorites;

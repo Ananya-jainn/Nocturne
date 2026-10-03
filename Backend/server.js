@@ -54,11 +54,11 @@ console.log("Spotify token response:", data);
 return data.access_token;
 };
 
-const searchSpotifyTracks = async (searchTerm, spotifyToken) => {
+const searchSpotifyTracks = async (searchTerm, genre, spotifyToken) => {
   const response = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(
       searchTerm
-    )}&type=track&limit=10`,
+    )}&type=track&limit=10&market=IN`,
     {
       headers: {
         Authorization: `Bearer ${spotifyToken}`,
@@ -68,7 +68,11 @@ const searchSpotifyTracks = async (searchTerm, spotifyToken) => {
 
   const data = await response.json();
 
-  return data.tracks.items;
+  console.log("Spotify search:", searchTerm);
+  console.log("Spotify total:", data.tracks?.total);
+  console.log("Spotify error:", data.error);
+
+  return data.tracks?.items || [];
 };
 
 app.post("/vibe", async (req, res) => {
@@ -78,7 +82,7 @@ app.post("/vibe", async (req, res) => {
   const {vibe} = req.body
   console.log(req.body);
   const response = await ai.models.generateContent({
-    model: "gemini-3.6-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `
       The user wants music based on this vibe:
 
@@ -104,45 +108,66 @@ app.post("/vibe", async (req, res) => {
   const vibeData = JSON.parse(cleanedText);
 
   console.log(vibeData);
+
   const spotifyToken = await getSpotifyToken();
-  const tracks = await searchSpotifyTracks(
-    vibeData.searchTerms[0],
-    spotifyToken
-  );
+
+  const genre = vibeData.genres[0];
+
+  const results = await Promise.all(
+  vibeData.searchTerms.map((term) =>
+    searchSpotifyTracks(term, genre , spotifyToken)
+  )
+);
+
+const tracks = results.flat();
+
+
+const uniqueTracks = tracks.filter(
+  (track, index, self) =>
+    index ===
+    self.findIndex(
+      (t) =>
+        t.name.toLowerCase() === track.name.toLowerCase() &&
+        t.artists[0]?.name.toLowerCase() ===
+          track.artists[0]?.name.toLowerCase()
+    )
+);
   console.log("Spotify token:", spotifyToken);
-  console.log("tracks output" , tracks);
+  console.log("tracks output" , uniqueTracks);
 
   res.json({
   moods: vibeData.moods,
   genres: vibeData.genres,
-  tracks: tracks,
+  tracks: uniqueTracks.slice(0, 15),
 });
 });
+
+
 
 app.post("/sign-up", async (req, res) => {
  try { const { name, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = new User({
-  name,
-  email,
-  password: hashedPassword,
+    name,
+    email,
+    password: hashedPassword,
   });
   console.log(user);
   await user.save();
   res.json({
-  message: "Account created successfully",
+    message: "Account created successfully",
   });
-} catch(error){
-  console.log("sign-up error:",error);
-  if (error.code === 11000) {
-    res.status(400).json({
-      message: "An account with this email already exists",
-    });
-  } else {
-      res.status(500).json({
-        message: "Something went wrong",
-      });
+ }  catch(error){
+      console.log("sign-up error:",error);
+      if (error.code === 11000) {
+          res.status(400).json({
+             message: "An account with this email already exists",
+          });
+      }else {
+        res.status(500).json({
+          message: "Something went wrong",
+        });
     };
   }
 });
@@ -164,6 +189,7 @@ app.post("/login",async(req,res) => {
     res.json({
       message: "Login successful",
       user: {
+        id: user._id,
         name: user.name,
         email: user.email
       }

@@ -2,6 +2,8 @@ import React from 'react';
 import { useLocation } from "react-router-dom";
 import { useEffect , useState} from 'react';
 import { searchTracks } from '../spotify';
+import { useDispatch, useSelector } from "react-redux";
+import { addSong, removeSong } from "../redux/favoritesSlice";
 
 function Vibe() {
 
@@ -29,6 +31,15 @@ function Vibe() {
         };
         sendVibe();
     }, [vibe]);
+
+    const dispatch = useDispatch();
+    const favoriteSongs = useSelector(
+            (state) => state.favorites.songs
+    );
+
+    const isFavorite = favoriteSongs.some(
+        (songs) => songs.id === recommendation.id
+    );
    
     return (
         
@@ -50,11 +61,16 @@ function Vibe() {
                 <div className="recommendations-scroll h-full overflow-y-auto pr-4">
 
             {/* Recommendations will go here */}
-                    {recommendation.map((song) => (
-                    <div
-                        key={song.name}
+                    {recommendation.map((song) => {
+                        const isFavorite = favoriteSongs.some(
+                            (favoriteSong) => favoriteSong.id === song.id
+                        );
+
+                        return (
+                            <div
+                            key={song.id}
                         className="flex items-center justify-between gap-5 border-b border-[#ad46e4c9]/40 py-5"
-                    >
+                        >
                         
                         <div className="h-16 w-16 rounded-xl overflow-hidden">
                         <img
@@ -74,14 +90,26 @@ function Vibe() {
                         </p>
                         </div>
                         <button
-                        className="text-2xl text-[#faebd7]/60 transition hover:scale-110 hover:text-[#ad46e4]"
+                        onClick={() => {
+                            if (isFavorite) {
+                            dispatch(removeSong(song));
+                            } else {
+                            dispatch(addSong(song));
+                            }
+                        }}
+                        className={`text-2xl transition-all duration-300 hover:scale-110 ${
+                            isFavorite
+                            ? "text-[#ad46e4] scale-110"
+                            : "text-[#faebd7]/60 hover:text-[#ad46e4]"
+                        }`}
                         >
-                         &#9829; 
+                        &#9829;
                         </button>
                     
                     </div>
                      
-                    ))}
+                    );
+                    })}
                  
                 </div>
             </div>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { addArtist, removeArtist } from "../redux/favoritesSlice";
 
 
 function Artist() {
@@ -63,11 +65,23 @@ function Artist() {
     },[id]);
     console.log(artists);
    
-    
+    const dispatch = useDispatch();
+    const favoriteArtists = useSelector(
+        (state) => state.favorites.artists
+    );
+
+
 
     if (!artists) {
     return <div>Loading...</div>;
     }
+    
+    
+
+
+    const isFavorite = favoriteArtists.some(
+        (artist) => artist.id === artists.id
+    );
 
     return (
         <>
@@ -143,9 +157,20 @@ function Artist() {
                 </p>
                 <div className="mt-auto flex justify-end">
                     <button
-                        className="text-2xl text-[#faebd7]/60 transition hover:scale-110 hover:text-[#ad46e4]"
-                    >
-                        &#9829; 
+                        onClick={() => {
+                            if (isFavorite) {
+                            dispatch(removeArtist(artists));
+                            } else {
+                            dispatch(addArtist(artists));
+                            }
+                        }}
+                        className={`text-2xl transition-all duration-300 hover:scale-110 ${
+                            isFavorite
+                            ? "text-[#ad46e4] scale-110"
+                            : "text-[#faebd7]/60 hover:text-[#ad46e4]"
+                        }`}
+                        >
+                        &#9829;
                     </button>
                 </div>
 

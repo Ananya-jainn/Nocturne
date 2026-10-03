@@ -47,7 +47,7 @@ function Home() {
           </Link>
 
           <Link
-            to="/favourites"
+            to="/favorites"
             className="hover:text-[#faebd7] transition"
           >
           Favourites

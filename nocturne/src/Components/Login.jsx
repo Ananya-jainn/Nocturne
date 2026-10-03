@@ -1,13 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate , useLocation } from "react-router-dom";
 import { useState } from "react";
 import { login } from "../redux/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch  } from "react-redux";
 
 function Login() {
   const[email,setEmail] = useState("")
   const[password , setPassword] = useState("")
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
       e.preventDefault();
@@ -28,7 +29,7 @@ function Login() {
         dispatch(login(data.user));
         console.log("Logged-in user:", data.user);
 
-        navigate("/");
+        navigate(location.state?.from?.pathname || "/");
       }
 
   

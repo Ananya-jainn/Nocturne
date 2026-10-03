@@ -15,6 +15,16 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+
+    favoriteArtists: {
+        type: Array,
+        default: []
+    },
+
+    favoriteSongs: {
+        type: Array,
+        default: []
     }
 });
 
