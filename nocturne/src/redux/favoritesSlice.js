@@ -28,6 +28,10 @@ const favoritesSlice = createSlice({
         (song) => song.id !== action.payload.id
       );
     },
+    setFavorites: (state, action) => {
+      state.artists = action.payload.artists;
+      state.songs = action.payload.songs;
+    },
   },
 });
 
@@ -37,6 +41,7 @@ export const {
   removeArtist,
   addSong,
   removeSong,
+  setFavorites,
 } = favoritesSlice.actions;
 
 export default favoritesSlice.reducer;

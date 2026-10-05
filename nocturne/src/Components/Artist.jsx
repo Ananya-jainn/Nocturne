@@ -66,6 +66,10 @@ function Artist() {
     console.log(artists);
    
     const dispatch = useDispatch();
+
+    const user = useSelector(
+    (state) => state.auth.user
+    );
     const favoriteArtists = useSelector(
         (state) => state.favorites.artists
     );
@@ -82,6 +86,10 @@ function Artist() {
     const isFavorite = favoriteArtists.some(
         (artist) => artist.id === artists.id
     );
+
+    console.log("Redux user:", user);
+    console.log("Artist:", artists);
+       
 
     return (
         <>
@@ -157,12 +165,35 @@ function Artist() {
                 </p>
                 <div className="mt-auto flex justify-end">
                     <button
-                        onClick={() => {
+                         onClick={async() => {
                             if (isFavorite) {
                             dispatch(removeArtist(artists));
+                                await fetch("http://localhost:3000/favorites/artist", {
+                                method: "DELETE",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    userId: user?.id,
+                                     artistId: artists.id,
+                                    }),
+                                });
                             } else {
                             dispatch(addArtist(artists));
-                            }
+
+                            await fetch("http://localhost:3000/favorites/artist", {
+                                method : "POST",
+                                headers : {
+                                    "Content-Type": "application/json" ,
+                        
+                                },
+                                body: JSON.stringify({
+                                    userId : user?.id,
+                                    artist: artists,
+                                }),
+                            });
+                            } 
+                            
                         }}
                         className={`text-2xl transition-all duration-300 hover:scale-110 ${
                             isFavorite

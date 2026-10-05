@@ -224,6 +224,99 @@ app.post("/favorites/song", async (req, res) => {
   }
 });
 
+app.delete("/favorites/song", async (req, res) => {
+  try {
+    const { userId, songId } = req.body;
+
+    const user = await User.findById(userId);
+
+    user.favoriteSongs = user.favoriteSongs.filter(
+      (song) => song.id !== songId
+    );
+
+    await user.save();
+
+    res.json({
+      message: "Song removed from favorites",
+    });
+
+  } catch (error) {
+    console.log("remove favorite song error:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+});
+
+app.post("/favorites/artist", async (req, res) => {
+  try {
+    const { userId, artist } = req.body;
+
+    const user = await User.findById(userId);
+
+    user.favoriteArtists.push(artist);
+
+    await user.save();
+
+    res.json({
+      message: "Artist added to favorites",
+    });
+
+  } catch (error) {
+    console.log("add favorite artist error:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+});
+
+app.delete("/favorites/artist", async (req, res) => {
+  try {
+    const { userId, artistId } = req.body;
+
+    const user = await User.findById(userId);
+
+    user.favoriteArtists = user.favoriteArtists.filter(
+      (artist) => artist.id !== artistId
+    );
+
+    await user.save();
+
+    res.json({
+      message: "Artist removed from favorites",
+    });
+
+  } catch (error) {
+    console.log("remove favorite artist error:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+});
+
+
+
+app.get("/favorites/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+
+    res.json({
+      artists: user.favoriteArtists,
+      songs: user.favoriteSongs,
+    });
+
+  } catch (error) {
+    console.log("get favorites error:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });

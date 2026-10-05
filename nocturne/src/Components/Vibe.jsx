@@ -37,8 +37,9 @@ function Vibe() {
             (state) => state.favorites.songs
     );
 
-    const isFavorite = favoriteSongs.some(
-        (songs) => songs.id === recommendation.id
+
+    const user = useSelector(
+    (state) => state.auth.user
     );
    
     return (
@@ -90,12 +91,35 @@ function Vibe() {
                         </p>
                         </div>
                         <button
-                        onClick={() => {
+                        onClick={async() => {
                             if (isFavorite) {
                             dispatch(removeSong(song));
+                             await fetch("http://localhost:3000/favorites/song", {
+                                method: "DELETE",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    userId: user.id,
+                                    songId: song.id,
+                                    }),
+                                });
                             } else {
                             dispatch(addSong(song));
-                            }
+
+                            await fetch("http://localhost:3000/favorites/song", {
+                                method : "POST",
+                                headers : {
+                                    "Content-Type": "application/json" ,
+                        
+                                },
+                                body: JSON.stringify({
+                                    userId : user.id,
+                                    song: song,
+                                }),
+                            });
+                            } 
+                            
                         }}
                         className={`text-2xl transition-all duration-300 hover:scale-110 ${
                             isFavorite

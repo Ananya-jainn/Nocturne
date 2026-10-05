@@ -1,57 +1,43 @@
-import { useState } from "react";
+import { useState  , useEffect} from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setFavorites } from "../redux/favoritesSlice";
 
-const favoriteSongs = [
-  {
-    id: 1,
-    name: "After Hours",
-    artist: "The Weeknd",
-    image: "https://placehold.co/300",
-  },
-  {
-    id: 2,
-    name: "Swim",
-    artist: "Chase Atlantic",
-    image: "https://placehold.co/300",
-  },
-  {
-    id: 3,
-    name: "Space Song",
-    artist: "Beach House",
-    image: "https://placehold.co/300",
-  },
-  {
-    id: 4,
-    name: "Apocalypse",
-    artist: "Cigarettes After Sex",
-    image: "https://placehold.co/300",
-  },
-];
-
-const favoriteArtists = [
-  {
-    id: 1,
-    name: "Chase Atlantic",
-    image: "https://placehold.co/300",
-  },
-  {
-    id: 2,
-    name: "The Weeknd",
-    image: "https://placehold.co/300",
-  },
-  {
-    id: 3,
-    name: "Tame Impala",
-    image: "https://placehold.co/300",
-  },
-  {
-    id: 4,
-    name: "Beach House",
-    image: "https://placehold.co/300",
-  },
-];
 
 function Favorites() {
   const [activeTab, setActiveTab] = useState("songs");
+
+  const dispatch = useDispatch();
+
+  const user = useSelector(
+    (state) => state.auth.user
+  )
+
+  const favoriteSongs = useSelector(
+  (state) => state.favorites.songs
+);
+
+const favoriteArtists = useSelector(
+  (state) => state.favorites.artists
+);
+
+
+  useEffect(() => {
+    const getFavorites = async () => {
+      const response = await fetch(
+        `http://localhost:3000/favorites/${user.id}`
+      );
+
+      const data = await response.json();
+
+      console.log("Favorites from MongoDB:", data);
+
+      dispatch(setFavorites(data));
+    };
+
+    if (user) {
+      getFavorites();
+    }
+  }, [user, dispatch]);
   return (
     <div className="min-h-screen bg-black px-6 py-10 text-[#faebd7]">
       <div className="mx-auto max-w-6xl">
@@ -99,13 +85,14 @@ function Favorites() {
         {activeTab === "songs" && (
           <div className="grid gap-4">
             {favoriteSongs.map((song) => (
+              
               <div
                 key={song.id}
                 className="group flex items-center justify-between rounded-2xl border border-[#faebd7]/10 p-4 transition hover:border-[#ad46e4]/60"
               >
                 <div className="flex items-center gap-5">
                   <img
-                    src={song.image}
+                    src={song.album?.images?.[0]?.url}
                     alt={song.name}
                     className="h-16 w-16 rounded-xl object-cover"
                   />
@@ -114,7 +101,7 @@ function Favorites() {
                     <h2 className="font-medium">{song.name}</h2>
 
                     <p className="mt-1 text-sm text-[#faebd7]/55">
-                      {song.artist}
+                      {song.artists?.map((artist) => artist.name).join(", ")}
                     </p>
                   </div>
                 </div>
@@ -138,7 +125,7 @@ function Favorites() {
               >
                 <div className="aspect-square overflow-hidden rounded-2xl bg-[#1a1a1a]">
                   <img
-                    src={artist.image}
+                    src={artist.images?.[0]?.url}
                     alt={artist.name}
                     className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                   />
