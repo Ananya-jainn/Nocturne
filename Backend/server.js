@@ -32,7 +32,16 @@ app.get("/", (req, res) => {
   res.send("Nocturne backend is working!");
   
 });
+let spotifyToken = null;
+let spotifyTokenExpiry = 0;
+
 const getSpotifyToken = async () => {
+  // Use existing token if it is still valid
+  if (spotifyToken && Date.now() < spotifyTokenExpiry) {
+    console.log("Using cached Spotify token ⚡");
+    return spotifyToken;
+  }
+
   const response = await fetch(
     "https://accounts.spotify.com/api/token",
     {
@@ -47,17 +56,24 @@ const getSpotifyToken = async () => {
       }),
     }
   );
-const data = await response.json();
 
-console.log("Spotify token response:", data);
+  const data = await response.json();
 
-return data.access_token;
+  console.log("New Spotify token fetched");
+
+  spotifyToken = data.access_token;
+
+  // Spotify normally gives expires_in in seconds.
+  // Keep a small safety buffer before expiry.
+  spotifyTokenExpiry =
+    Date.now() + (data.expires_in - 60) * 1000;
+
+  return spotifyToken;
 };
-
 const searchSpotifyTracks = async (searchTerm, genre, spotifyToken) => {
   const response = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-      searchTerm
+      `artist:${searchTerm}`
     )}&type=track&limit=10&market=IN`,
     {
       headers: {
@@ -68,11 +84,16 @@ const searchSpotifyTracks = async (searchTerm, genre, spotifyToken) => {
 
   const data = await response.json();
 
-  console.log("Spotify search:", searchTerm);
-  console.log("Spotify total:", data.tracks?.total);
+  console.log("Spotify artist search:", searchTerm);
+  console.log("Spotify status:", response.status);
   console.log("Spotify error:", data.error);
 
-  return data.tracks?.items || [];
+  if (!response.ok) {
+    return [];
+  }
+
+  // Maximum 2 songs from this artist
+  return (data.tracks?.items || []).slice(0, 2);
 };
 
 app.post("/vibe", async (req, res) => {
@@ -142,7 +163,115 @@ const uniqueTracks = tracks.filter(
 });
 });
 
+const getGenreArtists = async (genres) => {
+  const prompt = `
+You are a music recommendation system.
 
+For each genre below, give me 5 well-known artists that genuinely represent that genre.
+
+Genres:
+${genres.join(", ")}
+
+Rules:
+- Artists must genuinely belong to that genre.
+- Prefer artists with multiple songs available on Spotify.
+- Do not use the same artist for multiple genres unless they genuinely fit both.
+- Return ONLY valid JSON.
+- No explanation.
+
+Format:
+{
+  "pop": ["Artist 1", "Artist 2", "Artist 3", "Artist 4", "Artist 5"],
+  "indie": ["Artist 1", "Artist 2", "Artist 3", "Artist 4", "Artist 5"]
+}
+`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3.5-flash-lite",
+    contents: prompt,
+  });
+
+  const text = response.text.trim();
+
+  const cleanedText = text
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+
+  return JSON.parse(cleanedText);
+};
+
+let genreCache = null;
+let genreCacheTime = 0;
+let genreRequest = null;
+
+
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
+app.post("/genre", async (req, res) => {
+  try {
+    
+    const { genres } = req.body;
+    if (
+      genreCache &&
+      Date.now() - genreCacheTime < CACHE_DURATION
+    ) {
+      console.log("Using cached genre results ");
+      return res.json(genreCache);
+    }
+
+
+    const spotifyToken = await getSpotifyToken();
+
+    
+    // Get artists for ALL genres in one Gemini request
+    if (!genreRequest) {
+      genreRequest = getGenreArtists(genres);
+    }
+
+    const genreArtists = await genreRequest;
+
+    genreRequest = null;
+
+   
+    console.log("Genre artists:", genreArtists);
+
+    const results = {};
+
+    for (const genre of genres) {
+      const artists = genreArtists[genre] || [];
+
+      // Search all artists of this genre at the same time
+      const artistResults = await Promise.all(
+        artists.map((artist) =>
+          searchSpotifyTracks(
+            artist,
+            genre,
+            spotifyToken
+          )
+        )
+      );
+      
+
+      results[genre] = artistResults.flat().slice(0,10);
+    }
+
+    genreCache = results;
+    genreCacheTime = Date.now();
+
+    console.log("Genre results cached ");
+
+    
+    res.json(results);
+
+  } catch (error) {
+    console.log("genre error:", error);
+
+    res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+});
 
 app.post("/sign-up", async (req, res) => {
  try { const { name, email, password } = req.body;

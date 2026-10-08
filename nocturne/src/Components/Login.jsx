@@ -27,6 +27,9 @@ function Login() {
 
       if (response.ok) {
         dispatch(login(data.user));
+
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         console.log("Logged-in user:", data.user);
 
         navigate(location.state?.from?.pathname || "/");

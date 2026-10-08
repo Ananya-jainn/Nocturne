@@ -24,3 +24,12 @@ body {
   background: #a855f7;
   border-radius: 999px;
 }
+
+.genre-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.genre-scroll::-webkit-scrollbar {
+  display: none;
+}

@@ -70,6 +70,7 @@ const getToken = async code => {
         
         if (response.access_token) {
             localStorage.setItem('access_token', response.access_token)
+            localStorage.setItem('refresh_token', response.refresh_token)
 
             window.history.replaceState(null, "", "/")
         }
@@ -79,12 +80,39 @@ const getToken = async code => {
         );
 }
 
-const searchTracks = async (searchTerm) => {
-  const token = localStorage.getItem("access_token");
-
-  console.log("Spotify token:", token);
+const refreshAccessToken = async () => {
+  const refreshToken = localStorage.getItem("refresh_token");
 
   const response = await fetch(
+    "https://accounts.spotify.com/api/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        client_id: clientId,
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  console.log("Spotify refreshed token:", data);
+
+  if (data.access_token) {
+    localStorage.setItem("access_token", data.access_token);
+  }
+
+  return data.access_token;
+};
+
+const searchTracks = async (searchTerm) => {
+  let token = localStorage.getItem("access_token");
+
+  let response = await fetch(
     `https://api.spotify.com/v1/search?q=${encodeURIComponent(
       searchTerm
     )}&type=track&limit=10`,
@@ -95,13 +123,31 @@ const searchTracks = async (searchTerm) => {
     }
   );
 
+  // Access token expired
+  if (response.status === 401) {
+    console.log("Spotify token expired. Refreshing...");
+
+    token = await refreshAccessToken();
+
+    response = await fetch(
+      `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        searchTerm
+      )}&type=track&limit=10`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+
   const data = await response.json();
 
   console.log("Spotify response:", data);
 
-  return data.tracks.items;
+  return data.tracks?.items || [];
 };
 
 
-export {authorizeSpotify , getToken , searchTracks};
+export {authorizeSpotify , getToken , searchTracks , refreshAccessToken};
 

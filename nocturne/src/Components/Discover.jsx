@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState } from 'react';
-import { authorizeSpotify } from '../spotify';
+import { authorizeSpotify  , refreshAccessToken} from '../spotify';
 import { useNavigate } from 'react-router-dom';
 
 function Discover() {
@@ -20,11 +20,28 @@ function Discover() {
       })
      const finalUrl = url + '?' + params.toString()
     
-    const response = await (fetch(finalUrl,{
-      headers:{
-        Authorization :`Bearer ${token}`
-      }
-    }));
+    let response = await fetch(finalUrl, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+
+if (response.status === 401) {
+  console.log("Spotify token expired. Refreshing...");
+
+  const newToken = await refreshAccessToken();
+
+  if (!newToken) {
+    authorizeSpotify();
+    return;
+  }
+
+  response = await fetch(finalUrl, {
+    headers: {
+      Authorization: `Bearer ${newToken}`
+    }
+  });
+}
     const data = await response.json();
     console.log(data);
     console.log(data.artists.items)
