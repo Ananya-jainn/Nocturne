@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link , useNavigate} from "react-router-dom";
 import { useSelector , useDispatch } from "react-redux";
-
+import { logout } from "../redux/authSlice";
 
 function Home() {
   const [vibe, setVibe] = useState("");
@@ -14,6 +14,11 @@ function Home() {
 
   const isLoggedin = useSelector((state) => state.auth.isLoggedin);
   console.log(isLoggedin)
+
+  const handleLogout = () => {
+  dispatch(logout());
+  navigate("/");
+  };
 
   const handleVibeSearch = () => {
     navigate("/vibe",{
@@ -54,10 +59,23 @@ function Home() {
           </Link>
         </div>
 
-         <button className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#6d4aff] hover:text-[#6d4aff] transition"
-         onClick={() => navigate("/login")}>
-          Sign in
-        </button> 
+                
+        {isLoggedin ? (
+          <button
+            onClick={handleLogout}
+            className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#ad46e4] hover:text-[#ad46e4] transition"
+          >
+            Log out
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate("/login")}
+            className="border border-white/20 px-5 py-2 rounded-full text-sm hover:border-[#ad46e4] hover:text-[#ad46e4] transition"
+          >
+            Sign in
+          </button>
+        )}
+
 
       </nav>
 
