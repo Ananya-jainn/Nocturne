@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { addSong, removeSong } from "../redux/favoritesSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+
 function Genres() {
   const [genres, setGenres] = useState({});
   const [loading, setLoading] = useState(true);
@@ -13,7 +14,7 @@ function Genres() {
 
   useEffect(() => {
     const getGenres = async () => {
-      const response = await fetch("http://localhost:3000/genre", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/genre`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +106,7 @@ function Genres() {
                                 dispatch(removeSong(song));
 
                                 await fetch(
-                                  "http://localhost:3000/favorites/song",
+                                 `${import.meta.env.VITE_API_URL}/favorites/song`,
                                   {
                                     method: "DELETE",
                                     headers: {
@@ -121,7 +122,7 @@ function Genres() {
                                 dispatch(addSong(song));
 
                                 await fetch(
-                                  "http://localhost:3000/favorites/song",
+                                  `${import.meta.env.VITE_API_URL}/favorites/song`,
                                   {
                                     method: "POST",
                                     headers: {

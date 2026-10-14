@@ -3,6 +3,7 @@ import { useState } from "react";
 import { login } from "../redux/authSlice";
 import { useDispatch  } from "react-redux";
 
+
 function Login() {
   const[email,setEmail] = useState("")
   const[password , setPassword] = useState("")
@@ -13,7 +14,7 @@ function Login() {
   const handleSubmit = async (e) => {
       e.preventDefault();
         console.log("LOGIN BUTTON WORKED");
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

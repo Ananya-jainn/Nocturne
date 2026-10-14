@@ -24,7 +24,7 @@ const favoriteArtists = useSelector(
   useEffect(() => {
     const getFavorites = async () => {
       const response = await fetch(
-        `http://localhost:3000/favorites/${user.id}`
+        `${import.meta.env.VITE_API_URL}/favorites/${user.id}`
       );
 
       const data = await response.json();
@@ -34,7 +34,7 @@ const favoriteArtists = useSelector(
       dispatch(setFavorites(data));
     };
 
-    if (user) {
+    if (user?.id) {
       getFavorites();
     }
   }, [user, dispatch]);

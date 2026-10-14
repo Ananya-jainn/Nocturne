@@ -5,6 +5,8 @@ import { searchTracks } from '../spotify';
 import { useDispatch, useSelector } from "react-redux";
 import { addSong, removeSong } from "../redux/favoritesSlice";
 
+
+
 function Vibe() {
 
     const location = useLocation();
@@ -14,7 +16,7 @@ function Vibe() {
 
     useEffect(() => {
          const sendVibe = async () => {
-            const response = await fetch("http://localhost:3000/vibe", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/vibe`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -94,7 +96,7 @@ function Vibe() {
                         onClick={async() => {
                             if (isFavorite) {
                             dispatch(removeSong(song));
-                             await fetch("http://localhost:3000/favorites/song", {
+                             await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
                                 method: "DELETE",
                                 headers: {
                                     "Content-Type": "application/json",
@@ -107,7 +109,7 @@ function Vibe() {
                             } else {
                             dispatch(addSong(song));
 
-                            await fetch("http://localhost:3000/favorites/song", {
+                            await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
                                 method : "POST",
                                 headers : {
                                     "Content-Type": "application/json" ,

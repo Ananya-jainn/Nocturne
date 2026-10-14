@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addArtist, removeArtist } from "../redux/favoritesSlice";
 
 
+
 function Artist() {
     const {id} = useParams();
     const [artists , setArtists] = useState(null);
@@ -168,7 +169,7 @@ function Artist() {
                          onClick={async() => {
                             if (isFavorite) {
                             dispatch(removeArtist(artists));
-                                await fetch("http://localhost:3000/favorites/artist", {
+                                await fetch(`${import.meta.env.VITE_API_URL}/favorites/artist`, {
                                 method: "DELETE",
                                 headers: {
                                     "Content-Type": "application/json",
@@ -181,7 +182,7 @@ function Artist() {
                             } else {
                             dispatch(addArtist(artists));
 
-                            await fetch("http://localhost:3000/favorites/artist", {
+                            await fetch(`${import.meta.env.VITE_API_URL}/favorites/artist`, {
                                 method : "POST",
                                 headers : {
                                     "Content-Type": "application/json" ,

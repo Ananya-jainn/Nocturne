@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
 function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -11,7 +12,7 @@ function Signup() {
 
   const handleSubmit = async(e) =>{
     e.preventDefault();
-    const response = await fetch("http://localhost:3000/sign-up", {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/sign-up`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
