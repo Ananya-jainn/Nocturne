@@ -1,5 +1,5 @@
 const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
-const redirectUri = 'http://127.0.0.1:5173/callback';
+const redirectUri = "https://nocturne-ananya-jains-projects-f43d867b.vercel.app/callback";
 
 
 const generateRandomString = (length) => {
