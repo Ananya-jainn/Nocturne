@@ -1,69 +1,103 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
-import { useEffect , useState} from 'react';
-import { searchTracks } from '../spotify';
 import { useDispatch, useSelector } from "react-redux";
 import { addSong, removeSong } from "../redux/favoritesSlice";
 import Scroller from './Scroller';
 
-
-
 function Vibe() {
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+    const [recommendation, setRecommendation] = useState([]);
 
     const location = useLocation();
     const vibe = location.state?.vibe;
-    console.log(vibe)
-        const [recommendation , setRecommendation] = useState([]);
 
-    useEffect(() => {
-         const sendVibe = async () => {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/vibe`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                vibe: vibe,
-            }),
-            });
-
-                const data = await response.json();
-                console.log(data);
-                setRecommendation(data.tracks);
-                
-        };
-        sendVibe();
-    }, [vibe]);
+    console.log(vibe);
 
     const dispatch = useDispatch();
-    const favoriteSongs = useSelector(
-            (state) => state.favorites.songs
-    );
 
+    const favoriteSongs = useSelector(
+        (state) => state.favorites.songs
+    );
 
     const user = useSelector(
-    (state) => state.auth.user
+        (state) => state.auth.user
     );
-   
-    return (
-        
-        <>
-         <div className="min-h-screen bg-black text-[#faebd7] p-6">
 
-            
+    useEffect(() => {
+
+        const sendVibe = async () => {
+
+            setLoading(true);
+            setError(false);
+            setRecommendation([]);
+
+            try {
+                const response = await fetch(
+                    `${import.meta.env.VITE_API_URL}/vibe`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            vibe: vibe,
+                        }),
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch recommendations");
+                }
+
+                const data = await response.json();
+
+                console.log(data);
+
+                setRecommendation(
+                    Array.isArray(data.tracks) ? data.tracks : []
+                );
+
+            } catch (err) {
+                console.error(err);
+                setError(true);
+
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (vibe) {
+            sendVibe();
+        } else {
+            setLoading(false);
+            setError(true);
+        }
+
+    }, [vibe]);
+
+
+    return (
+        <div className="min-h-screen bg-black text-[#faebd7] p-6">
+
             {/* Heading */}
             <div className="text-center">
                 <h1 className="font-display text-5xl font-semibold tracking-tight">
-                VIBE?
+                    VIBE?
                 </h1>
 
                 <p className="mt-4 text-[#faebd7]/70">
-                "{vibe}"
+                    "{vibe}"
                 </p>
             </div>
+
             {/* Recommendations container */}
             <div className="max-w-3xl mx-auto mt-12 border border-[#ad46e4c9] rounded-[30px] p-5 h-125 overflow-hidden">
+
                 <div className="recommendations-scroll h-full overflow-y-auto pr-4">
+
                     <Scroller
                         loading={loading}
                         data={recommendation}
@@ -71,87 +105,96 @@ function Vibe() {
                     />
 
                     {!loading && !error && recommendation?.length > 0 && (
+
                         <div>
                             {recommendation.map((song) => {
+
                                 const isFavorite = favoriteSongs.some(
                                     (favoriteSong) => favoriteSong.id === song.id
                                 );
 
                                 return (
                                     <div
-                                    key={song.id}
-                                    className="flex items-center justify-between gap-5 border-b border-[#ad46e4c9]/40 py-5"
+                                        key={song.id}
+                                        className="flex items-center justify-between gap-5 border-b border-[#ad46e4c9]/40 py-5"
                                     >
-                                    
-                                    <div className="h-16 w-16 rounded-xl overflow-hidden">
-                                    <img
-                                        src={song.album.images[0]?.url}
-                                        alt={song.id}
-                                        className="h-full w-full object-cover"
-                                    />
+
+                                        <div className="h-16 w-16 rounded-xl overflow-hidden">
+                                            <img
+                                                src={song.album?.images?.[0]?.url}
+                                                alt={song.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <h2 className="text-lg font-semibold">
+                                                {song.name}
+                                            </h2>
+
+                                            <p className="mt-1 text-sm text-[#faebd7]/60">
+                                                {song.artists.map((artist) => artist.name).join(", ")}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            onClick={async () => {
+
+                                                if (isFavorite) {
+
+                                                    dispatch(removeSong(song));
+
+                                                    await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
+                                                        method: "DELETE",
+                                                        headers: {
+                                                            "Content-Type": "application/json",
+                                                        },
+                                                        body: JSON.stringify({
+                                                            userId: user.id,
+                                                            songId: song.id,
+                                                        }),
+                                                    });
+
+                                                } else {
+
+                                                    dispatch(addSong(song));
+
+                                                    await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
+                                                        method: "POST",
+                                                        headers: {
+                                                            "Content-Type": "application/json",
+                                                        },
+                                                        body: JSON.stringify({
+                                                            userId: user.id,
+                                                            song: song,
+                                                        }),
+                                                    });
+
+                                                }
+
+                                            }}
+                                            className={`text-2xl transition-all duration-300 hover:scale-110 ${
+                                                isFavorite
+                                                    ? "text-[#ad46e4] scale-110"
+                                                    : "text-[#faebd7]/60 hover:text-[#ad46e4]"
+                                            }`}
+                                        >
+                                            &#9829;
+                                        </button>
+
                                     </div>
-
-                                    <div>
-                                    <h2 className="text-lg font-semibold">
-                                        {song.name}
-                                    </h2>
-
-                                    <p className="mt-1 text-sm text-[#faebd7]/60">
-                                        {song.artists.map((artist) => artist.name).join(", ")}
-                                    </p>
-                                    </div>
-                                    <button
-                                    onClick={async() => {
-                                        if (isFavorite) {
-                                        dispatch(removeSong(song));
-                                        await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
-                                            method: "DELETE",
-                                            headers: {
-                                                "Content-Type": "application/json",
-                                            },
-                                            body: JSON.stringify({
-                                                userId: user.id,
-                                                songId: song.id,
-                                                }),
-                                            });
-                                        } else {
-                                        dispatch(addSong(song));
-
-                                        await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
-                                            method : "POST",
-                                            headers : {
-                                                "Content-Type": "application/json" ,
-                                    
-                                            },
-                                            body: JSON.stringify({
-                                                userId : user.id,
-                                                song: song,
-                                            }),
-                                        });
-                                        } 
-                                        
-                                    }}
-                                    className={`text-2xl transition-all duration-300 hover:scale-110 ${
-                                        isFavorite
-                                        ? "text-[#ad46e4] scale-110"
-                                        : "text-[#faebd7]/60 hover:text-[#ad46e4]"
-                                    }`}
-                                    >
-                                    &#9829;
-                                    </button>
-                                
-                                </div>
                                 );
+
                             })}
                         </div>
-                        )}
+
+                    )}
 
                 </div>
             </div>
 
-    </div>
-        </>
-    )
+        </div>
+    );
 }
 
-export default Vibe
+export default Vibe;
