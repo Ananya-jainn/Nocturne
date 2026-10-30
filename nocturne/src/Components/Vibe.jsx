@@ -4,6 +4,7 @@ import { useEffect , useState} from 'react';
 import { searchTracks } from '../spotify';
 import { useDispatch, useSelector } from "react-redux";
 import { addSong, removeSong } from "../redux/favoritesSlice";
+import Scroller from './Scroller';
 
 
 
@@ -49,6 +50,7 @@ function Vibe() {
         <>
          <div className="min-h-screen bg-black text-[#faebd7] p-6">
 
+            
             {/* Heading */}
             <div className="text-center">
                 <h1 className="font-display text-5xl font-semibold tracking-tight">
@@ -62,81 +64,88 @@ function Vibe() {
             {/* Recommendations container */}
             <div className="max-w-3xl mx-auto mt-12 border border-[#ad46e4c9] rounded-[30px] p-5 h-125 overflow-hidden">
                 <div className="recommendations-scroll h-full overflow-y-auto pr-4">
+                    <Scroller
+                        loading={loading}
+                        data={recommendation}
+                        error={error}
+                    />
 
-            {/* Recommendations will go here */}
-                    {recommendation.map((song) => {
-                        const isFavorite = favoriteSongs.some(
-                            (favoriteSong) => favoriteSong.id === song.id
-                        );
-
-                        return (
-                            <div
-                            key={song.id}
-                        className="flex items-center justify-between gap-5 border-b border-[#ad46e4c9]/40 py-5"
-                        >
-                        
-                        <div className="h-16 w-16 rounded-xl overflow-hidden">
-                        <img
-                            src={song.album.images[0]?.url}
-                            alt={song.id}
-                            className="h-full w-full object-cover"
-                        />
-                        </div>
-
+                    {!loading && !error && recommendation?.length > 0 && (
                         <div>
-                        <h2 className="text-lg font-semibold">
-                            {song.name}
-                        </h2>
+                            {recommendation.map((song) => {
+                                const isFavorite = favoriteSongs.some(
+                                    (favoriteSong) => favoriteSong.id === song.id
+                                );
 
-                        <p className="mt-1 text-sm text-[#faebd7]/60">
-                            {song.artists.map((artist) => artist.name).join(", ")}
-                        </p>
+                                return (
+                                    <div
+                                    key={song.id}
+                                    className="flex items-center justify-between gap-5 border-b border-[#ad46e4c9]/40 py-5"
+                                    >
+                                    
+                                    <div className="h-16 w-16 rounded-xl overflow-hidden">
+                                    <img
+                                        src={song.album.images[0]?.url}
+                                        alt={song.id}
+                                        className="h-full w-full object-cover"
+                                    />
+                                    </div>
+
+                                    <div>
+                                    <h2 className="text-lg font-semibold">
+                                        {song.name}
+                                    </h2>
+
+                                    <p className="mt-1 text-sm text-[#faebd7]/60">
+                                        {song.artists.map((artist) => artist.name).join(", ")}
+                                    </p>
+                                    </div>
+                                    <button
+                                    onClick={async() => {
+                                        if (isFavorite) {
+                                        dispatch(removeSong(song));
+                                        await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
+                                            method: "DELETE",
+                                            headers: {
+                                                "Content-Type": "application/json",
+                                            },
+                                            body: JSON.stringify({
+                                                userId: user.id,
+                                                songId: song.id,
+                                                }),
+                                            });
+                                        } else {
+                                        dispatch(addSong(song));
+
+                                        await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
+                                            method : "POST",
+                                            headers : {
+                                                "Content-Type": "application/json" ,
+                                    
+                                            },
+                                            body: JSON.stringify({
+                                                userId : user.id,
+                                                song: song,
+                                            }),
+                                        });
+                                        } 
+                                        
+                                    }}
+                                    className={`text-2xl transition-all duration-300 hover:scale-110 ${
+                                        isFavorite
+                                        ? "text-[#ad46e4] scale-110"
+                                        : "text-[#faebd7]/60 hover:text-[#ad46e4]"
+                                    }`}
+                                    >
+                                    &#9829;
+                                    </button>
+                                
+                                </div>
+                                );
+                            })}
                         </div>
-                        <button
-                        onClick={async() => {
-                            if (isFavorite) {
-                            dispatch(removeSong(song));
-                             await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
-                                method: "DELETE",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    userId: user.id,
-                                    songId: song.id,
-                                    }),
-                                });
-                            } else {
-                            dispatch(addSong(song));
+                        )}
 
-                            await fetch(`${import.meta.env.VITE_API_URL}/favorites/song`, {
-                                method : "POST",
-                                headers : {
-                                    "Content-Type": "application/json" ,
-                        
-                                },
-                                body: JSON.stringify({
-                                    userId : user.id,
-                                    song: song,
-                                }),
-                            });
-                            } 
-                            
-                        }}
-                        className={`text-2xl transition-all duration-300 hover:scale-110 ${
-                            isFavorite
-                            ? "text-[#ad46e4] scale-110"
-                            : "text-[#faebd7]/60 hover:text-[#ad46e4]"
-                        }`}
-                        >
-                        &#9829;
-                        </button>
-                    
-                    </div>
-                     
-                    );
-                    })}
-                 
                 </div>
             </div>
 
